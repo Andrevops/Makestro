@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.2] — 2026-04-09
+
+### Bug Fixes
+- Use per-repo terminals with icon instead of prefixed name
+
+
 ## [0.3.1] — 2026-04-09
 
 ### Bug Fixes
