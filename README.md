@@ -11,8 +11,8 @@ Built for engineers who live in Makefiles but don't want to keep switching to th
 - **Section grouping** via `### Section Name` comments in your Makefile
 - **Target descriptions** via `## Description` comments above targets
 - **`.PHONY` awareness** — icons differentiate phony vs file-based targets
-- **Quick Run** (`Alt+M Alt+R`) — fuzzy-search picker across all targets
-- **Re-run Last** (`Alt+M Alt+L`) — instantly repeat the last executed target
+- **Quick Run** (`Alt+M R`) — fuzzy-search picker across all targets
+- **Re-run Last** (`Alt+M L`) — instantly repeat the last executed target
 - **Run with Arguments** — prompt for variable overrides like `VERBOSE=1`
 - **Pin / Unpin** targets via right-click context menu
 - **Go to Target** — jump to the exact line in the Makefile
@@ -55,9 +55,9 @@ Both prefixes are configurable via settings.
 
 | Shortcut | Command |
 |----------|---------|
-| `Alt+M Alt+R` | Quick Run (fuzzy picker) |
-| `Alt+M Alt+L` | Re-run Last Target |
-| `Alt+M Alt+S` | Stop Running Target |
+| `Alt+M R` | Quick Run (fuzzy picker) |
+| `Alt+M L` | Re-run Last Target |
+| `Alt+M S` | Stop Running Target |
 
 ## Commands
 

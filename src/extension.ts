@@ -249,11 +249,10 @@ export async function activate(
 
         if (!pinned.includes(target.name)) {
           pinned.push(target.name);
-          await config.update(
-            'pinnedTargets',
-            pinned,
-            vscode.ConfigurationTarget.Workspace
-          );
+          const scope = vscode.workspace.workspaceFolders
+            ? vscode.ConfigurationTarget.Workspace
+            : vscode.ConfigurationTarget.Global;
+          await config.update('pinnedTargets', pinned, scope);
           await refreshTargets();
         }
       }
@@ -273,11 +272,10 @@ export async function activate(
         const pinned = config.get<string[]>('pinnedTargets', []);
         const updated = pinned.filter((n) => n !== target.name);
 
-        await config.update(
-          'pinnedTargets',
-          updated,
-          vscode.ConfigurationTarget.Workspace
-        );
+        const scope = vscode.workspace.workspaceFolders
+          ? vscode.ConfigurationTarget.Workspace
+          : vscode.ConfigurationTarget.Global;
+        await config.update('pinnedTargets', updated, scope);
         await refreshTargets();
       }
     )
@@ -364,11 +362,10 @@ export async function activate(
       });
 
       if (picked) {
-        await config.update(
-          'defaultMakefile',
-          picked.detail,
-          vscode.ConfigurationTarget.Workspace
-        );
+        const scope = vscode.workspace.workspaceFolders
+          ? vscode.ConfigurationTarget.Workspace
+          : vscode.ConfigurationTarget.Global;
+        await config.update('defaultMakefile', picked.detail, scope);
         await refreshTargets();
       }
     })

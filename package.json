@@ -225,17 +225,17 @@
     "keybindings": [
       {
         "command": "makestro.quickRun",
-        "key": "alt+m alt+r",
+        "key": "alt+m r",
         "when": "!terminalFocus"
       },
       {
         "command": "makestro.runLastTarget",
-        "key": "alt+m alt+l",
+        "key": "alt+m l",
         "when": "!terminalFocus"
       },
       {
         "command": "makestro.stopRunning",
-        "key": "alt+m alt+s",
+        "key": "alt+m s",
         "when": "!terminalFocus"
       }
     ],
