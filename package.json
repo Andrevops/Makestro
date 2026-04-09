@@ -1,0 +1,306 @@
+{
+  "name": "makestro",
+  "displayName": "Makestro",
+  "description": "A language-agnostic Makefile target runner with sidebar navigation, quick-pick, pinned targets, and section grouping.",
+  "version": "0.1.0",
+  "publisher": "andrevops",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "makefile",
+    "make",
+    "build",
+    "task runner",
+    "devops"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "icon": "images/makestro-icon.png",
+  "activationEvents": [
+    "workspaceContains:**/Makefile",
+    "workspaceContains:**/makefile",
+    "workspaceContains:**/GNUmakefile"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "makestro",
+          "title": "Makestro",
+          "icon": "$(tools)"
+        }
+      ]
+    },
+    "views": {
+      "makestro": [
+        {
+          "id": "makestro.pinnedTargets",
+          "name": "Pinned Targets"
+        },
+        {
+          "id": "makestro.targets",
+          "name": "Targets"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "makestro.targets",
+        "contents": "No Makefile found in the workspace.\n[Open Folder](command:vscode.openFolder)"
+      },
+      {
+        "view": "makestro.pinnedTargets",
+        "contents": "No pinned targets yet.\nRight-click a target and select \"Pin Target\" to add it here."
+      }
+    ],
+    "commands": [
+      {
+        "command": "makestro.runTarget",
+        "title": "Run Target",
+        "category": "Makestro",
+        "icon": "$(play)"
+      },
+      {
+        "command": "makestro.runTargetWithArgs",
+        "title": "Run Target with Arguments...",
+        "category": "Makestro",
+        "icon": "$(play-circle)"
+      },
+      {
+        "command": "makestro.quickRun",
+        "title": "Quick Run...",
+        "category": "Makestro",
+        "icon": "$(zap)"
+      },
+      {
+        "command": "makestro.runLastTarget",
+        "title": "Re-run Last Target",
+        "category": "Makestro",
+        "icon": "$(history)"
+      },
+      {
+        "command": "makestro.stopRunning",
+        "title": "Stop Running Target",
+        "category": "Makestro",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "makestro.refresh",
+        "title": "Refresh Targets",
+        "category": "Makestro",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "makestro.pinTarget",
+        "title": "Pin Target",
+        "category": "Makestro",
+        "icon": "$(pin)"
+      },
+      {
+        "command": "makestro.unpinTarget",
+        "title": "Unpin Target",
+        "category": "Makestro",
+        "icon": "$(pinned)"
+      },
+      {
+        "command": "makestro.openMakefile",
+        "title": "Open Makefile",
+        "category": "Makestro",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "makestro.goToTarget",
+        "title": "Go to Target in Makefile",
+        "category": "Makestro",
+        "icon": "$(symbol-event)"
+      },
+      {
+        "command": "makestro.selectMakefile",
+        "title": "Select Makefile...",
+        "category": "Makestro",
+        "icon": "$(file)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "makestro.refresh",
+          "when": "view == makestro.targets",
+          "group": "navigation"
+        },
+        {
+          "command": "makestro.quickRun",
+          "when": "view == makestro.targets",
+          "group": "navigation"
+        },
+        {
+          "command": "makestro.selectMakefile",
+          "when": "view == makestro.targets",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "makestro.runTarget",
+          "when": "view == makestro.targets && viewItem == target",
+          "group": "inline"
+        },
+        {
+          "command": "makestro.runTarget",
+          "when": "view == makestro.pinnedTargets && viewItem == target",
+          "group": "inline"
+        },
+        {
+          "command": "makestro.runTargetWithArgs",
+          "when": "viewItem == target",
+          "group": "1_run"
+        },
+        {
+          "command": "makestro.pinTarget",
+          "when": "view == makestro.targets && viewItem == target",
+          "group": "2_manage"
+        },
+        {
+          "command": "makestro.unpinTarget",
+          "when": "view == makestro.pinnedTargets && viewItem == target",
+          "group": "2_manage"
+        },
+        {
+          "command": "makestro.goToTarget",
+          "when": "viewItem == target",
+          "group": "3_navigate"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "makestro.runTarget",
+          "when": "false"
+        },
+        {
+          "command": "makestro.pinTarget",
+          "when": "false"
+        },
+        {
+          "command": "makestro.unpinTarget",
+          "when": "false"
+        },
+        {
+          "command": "makestro.goToTarget",
+          "when": "false"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "makestro.quickRun",
+        "key": "alt+m alt+r",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runLastTarget",
+        "key": "alt+m alt+l",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.stopRunning",
+        "key": "alt+m alt+s",
+        "when": "!terminalFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Makestro",
+      "properties": {
+        "makestro.makeCommand": {
+          "type": "string",
+          "default": "make",
+          "description": "Path to the make binary."
+        },
+        "makestro.scanDepth": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Maximum directory depth to scan for Makefiles."
+        },
+        "makestro.excludePatterns": {
+          "type": "array",
+          "default": [
+            "**/node_modules/**",
+            "**/.git/**",
+            "**/vendor/**",
+            "**/dist/**",
+            "**/out/**"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Glob patterns for directories to exclude when scanning."
+        },
+        "makestro.descriptionCommentPrefix": {
+          "type": "string",
+          "default": "##",
+          "description": "Comment prefix used to extract target descriptions (e.g., '##' for lines like '## Build the project')."
+        },
+        "makestro.sectionCommentPrefix": {
+          "type": "string",
+          "default": "###",
+          "description": "Comment prefix used to define sections/groups (e.g., '### Build Targets')."
+        },
+        "makestro.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh targets when Makefile changes."
+        },
+        "makestro.pinnedTargets": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "List of pinned target names (managed via context menu)."
+        },
+        "makestro.showPhonyOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only show .PHONY targets (filters out file-based targets)."
+        },
+        "makestro.runInIntegratedTerminal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run targets in VS Code integrated terminal (false = output channel)."
+        },
+        "makestro.defaultMakefile": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the default Makefile to use (empty = auto-detect)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}
