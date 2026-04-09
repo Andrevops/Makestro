@@ -3,8 +3,7 @@ import * as path from 'path';
 import { MakeTarget } from '../types';
 
 export class TargetRunner {
-  private activeTerminal: vscode.Terminal | undefined;
-  private terminalClosed = false;
+  private terminals = new Map<string, vscode.Terminal>();
   private lastTarget: { target: MakeTarget; args?: string } | undefined;
 
   async run(target: MakeTarget, args?: string): Promise<void> {
@@ -32,7 +31,7 @@ export class TargetRunner {
     this.lastTarget = { target, args };
 
     if (useTerminal) {
-      await this.runInTerminal(command, makefileDir, target.name);
+      await this.runInTerminal(command, makefileDir);
     } else {
       await this.runInOutputChannel(command, makefileDir, target.name);
     }
@@ -48,37 +47,39 @@ export class TargetRunner {
   }
 
   stop(): void {
-    if (this.activeTerminal) {
-      this.activeTerminal.dispose();
-      this.activeTerminal = undefined;
+    for (const terminal of this.terminals.values()) {
+      terminal.dispose();
     }
+    this.terminals.clear();
   }
 
   private async runInTerminal(
     command: string,
-    cwd: string,
-    _targetName: string
+    cwd: string
   ): Promise<void> {
-    // Reuse existing Makestro terminal or create a new one
-    if (!this.activeTerminal || this.terminalClosed) {
-      this.activeTerminal = vscode.window.createTerminal({
-        name: 'Makestro',
+    // One terminal per repo directory, named after the folder
+    let terminal = this.terminals.get(cwd);
+
+    if (!terminal) {
+      const repoName = path.basename(cwd);
+      terminal = vscode.window.createTerminal({
+        name: repoName,
         cwd,
         iconPath: new vscode.ThemeIcon('tools'),
       });
-      this.terminalClosed = false;
+
+      this.terminals.set(cwd, terminal);
 
       const disposable = vscode.window.onDidCloseTerminal((t) => {
-        if (t === this.activeTerminal) {
-          this.activeTerminal = undefined;
-          this.terminalClosed = true;
+        if (t === terminal) {
+          this.terminals.delete(cwd);
           disposable.dispose();
         }
       });
     }
 
-    this.activeTerminal.show();
-    this.activeTerminal.sendText(command);
+    terminal.show();
+    terminal.sendText(command);
   }
 
   private async runInOutputChannel(
