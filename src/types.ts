@@ -36,3 +36,10 @@ export interface ParseResult {
   phonyTargets: Set<string>;
   makefilePath: string;
 }
+
+/** Public API shape exposed by the Diffchestrator extension (optional dependency) */
+export interface DiffchestratorApi {
+  getCurrentRoot(): string | undefined;
+  getSelectedRepo(): string | undefined;
+  onDidChangeSelection: import('vscode').Event<void>;
+}

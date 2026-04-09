@@ -27,7 +27,8 @@
   "activationEvents": [
     "workspaceContains:**/Makefile",
     "workspaceContains:**/makefile",
-    "workspaceContains:**/GNUmakefile"
+    "workspaceContains:**/GNUmakefile",
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -50,6 +51,20 @@
           "id": "makestro.targets",
           "name": "Targets"
         }
+      ],
+      "explorer": [
+        {
+          "id": "makestro.explorerTargets",
+          "name": "Make Targets",
+          "when": "makestro.hasMakefile",
+          "visibility": "collapsed"
+        },
+        {
+          "id": "makestro.explorerPinnedTargets",
+          "name": "Pinned Make Targets",
+          "when": "makestro.hasPinnedTargets",
+          "visibility": "collapsed"
+        }
       ]
     },
     "viewsWelcome": [
@@ -60,6 +75,14 @@
       {
         "view": "makestro.pinnedTargets",
         "contents": "No pinned targets yet.\nRight-click a target and select \"Pin Target\" to add it here."
+      },
+      {
+        "view": "makestro.explorerTargets",
+        "contents": "No Makefile found.\n[Open Folder](command:vscode.openFolder)"
+      },
+      {
+        "view": "makestro.explorerPinnedTargets",
+        "contents": "No pinned targets yet.\nRight-click a target and select \"Pin Target\"."
       }
     ],
     "commands": [
@@ -134,29 +157,29 @@
       "view/title": [
         {
           "command": "makestro.refresh",
-          "when": "view == makestro.targets",
+          "when": "view == makestro.targets || view == makestro.explorerTargets",
           "group": "navigation"
         },
         {
           "command": "makestro.quickRun",
-          "when": "view == makestro.targets",
+          "when": "view == makestro.targets || view == makestro.explorerTargets",
           "group": "navigation"
         },
         {
           "command": "makestro.selectMakefile",
-          "when": "view == makestro.targets",
+          "when": "view == makestro.targets || view == makestro.explorerTargets",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "makestro.runTarget",
-          "when": "view == makestro.targets && viewItem == target",
+          "when": "(view == makestro.targets || view == makestro.explorerTargets) && viewItem == target",
           "group": "inline"
         },
         {
           "command": "makestro.runTarget",
-          "when": "view == makestro.pinnedTargets && viewItem == target",
+          "when": "(view == makestro.pinnedTargets || view == makestro.explorerPinnedTargets) && viewItem == target",
           "group": "inline"
         },
         {
@@ -166,12 +189,12 @@
         },
         {
           "command": "makestro.pinTarget",
-          "when": "view == makestro.targets && viewItem == target",
+          "when": "(view == makestro.targets || view == makestro.explorerTargets) && viewItem == target",
           "group": "2_manage"
         },
         {
           "command": "makestro.unpinTarget",
-          "when": "view == makestro.pinnedTargets && viewItem == target",
+          "when": "(view == makestro.pinnedTargets || view == makestro.explorerPinnedTargets) && viewItem == target",
           "group": "2_manage"
         },
         {

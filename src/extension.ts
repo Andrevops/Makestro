@@ -9,9 +9,27 @@ import {
 import { MakestroTaskProvider } from './providers/taskProvider';
 import { TargetRunner } from './runners/targetRunner';
 import { MakefileWatcher } from './watchers/fileWatcher';
-import { MakeTarget } from './types';
+import { MakeTarget, DiffchestratorApi } from './types';
+
+const DIFFCHESTRATOR_ID = 'andrevops-com.diffchestrator';
 
 let activeMakefilePath: string | undefined;
+let diffchestratorApi: DiffchestratorApi | undefined;
+
+async function getDiffchestratorApi(): Promise<DiffchestratorApi | undefined> {
+  const ext = vscode.extensions.getExtension<DiffchestratorApi>(DIFFCHESTRATOR_ID);
+  if (!ext) {
+    return undefined;
+  }
+  if (!ext.isActive) {
+    try {
+      return await ext.activate();
+    } catch {
+      return undefined;
+    }
+  }
+  return ext.exports;
+}
 
 export async function activate(
   context: vscode.ExtensionContext
@@ -27,27 +45,42 @@ export async function activate(
   const runner = new TargetRunner();
   const watcher = new MakefileWatcher();
 
-  // Register tree views
+  // Register tree views (sidebar + explorer)
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('makestro.targets', targetTree),
-    vscode.window.registerTreeDataProvider('makestro.pinnedTargets', pinnedTree)
+    vscode.window.registerTreeDataProvider('makestro.pinnedTargets', pinnedTree),
+    vscode.window.registerTreeDataProvider('makestro.explorerTargets', targetTree),
+    vscode.window.registerTreeDataProvider('makestro.explorerPinnedTargets', pinnedTree)
   );
 
   // Register task provider
   context.subscriptions.push(
     vscode.tasks.registerTaskProvider(
       MakestroTaskProvider.type,
-      new MakestroTaskProvider(parser)
+      new MakestroTaskProvider(parser, () => diffchestratorApi?.getSelectedRepo())
     )
   );
 
   // --- Core refresh logic ---
 
   async function refreshTargets(): Promise<void> {
-    const makefilePath = await resolveMakefile();
+    const diffRepoPath = diffchestratorApi?.getSelectedRepo();
+    const makefilePath = await resolveMakefile(diffRepoPath);
+
+    vscode.commands.executeCommand('setContext', 'makestro.hasMakefile', !!makefilePath);
+
     if (!makefilePath) {
       targetTree.refresh(undefined);
+      vscode.commands.executeCommand('setContext', 'makestro.hasPinnedTargets', false);
       return;
+    }
+
+    // Watch external path if Makefile comes from outside workspace
+    const isExternal = diffRepoPath && makefilePath.startsWith(diffRepoPath);
+    if (isExternal) {
+      watcher.watchExternalPath(path.dirname(makefilePath));
+    } else {
+      watcher.clearExternalWatch();
     }
 
     activeMakefilePath = makefilePath;
@@ -64,12 +97,15 @@ export async function activate(
       .getConfiguration('makestro')
       .get<string[]>('pinnedTargets', []);
     pinnedTree.refresh(result.targets, pinnedNames);
+
+    vscode.commands.executeCommand('setContext', 'makestro.hasPinnedTargets', pinnedNames.length > 0);
   }
 
-  async function resolveMakefile(): Promise<string | undefined> {
+  async function resolveMakefile(diffchestratorRepoPath?: string): Promise<string | undefined> {
     const config = vscode.workspace.getConfiguration('makestro');
     const defaultMakefile = config.get<string>('defaultMakefile', '');
 
+    // Priority 1: explicit user config
     if (defaultMakefile) {
       const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (workspaceRoot) {
@@ -80,14 +116,25 @@ export async function activate(
       }
     }
 
-    // Auto-discover
+    const scanDepth = config.get<number>('scanDepth', 3);
+    const excludePatterns = config.get<string[]>('excludePatterns', []);
+
+    // Priority 2: Diffchestrator selected repo
+    if (diffchestratorRepoPath) {
+      const makefiles = await discoverMakefiles(diffchestratorRepoPath, scanDepth, excludePatterns);
+      if (makefiles.length > 0) {
+        const rootMakefile = makefiles.find(
+          (m) => path.dirname(m) === diffchestratorRepoPath
+        );
+        return rootMakefile || makefiles[0];
+      }
+    }
+
+    // Priority 3: workspace folder auto-discovery
     const folders = vscode.workspace.workspaceFolders;
     if (!folders) {
       return undefined;
     }
-
-    const scanDepth = config.get<number>('scanDepth', 3);
-    const excludePatterns = config.get<string[]>('excludePatterns', []);
 
     for (const folder of folders) {
       const makefiles = await discoverMakefiles(
@@ -96,7 +143,6 @@ export async function activate(
         excludePatterns
       );
       if (makefiles.length > 0) {
-        // Prefer root Makefile
         const rootMakefile = makefiles.find(
           (m) => path.dirname(m) === folder.uri.fsPath
         );
@@ -271,35 +317,45 @@ export async function activate(
 
   context.subscriptions.push(
     vscode.commands.registerCommand('makestro.selectMakefile', async () => {
-      const folders = vscode.workspace.workspaceFolders;
-      if (!folders) {
-        return;
-      }
-
       const config = vscode.workspace.getConfiguration('makestro');
       const scanDepth = config.get<number>('scanDepth', 3);
       const excludePatterns = config.get<string[]>('excludePatterns', []);
 
       const allMakefiles: string[] = [];
-      for (const folder of folders) {
-        const found = await discoverMakefiles(
-          folder.uri.fsPath,
-          scanDepth,
-          excludePatterns
-        );
-        allMakefiles.push(...found);
+      const folders = vscode.workspace.workspaceFolders;
+
+      if (folders) {
+        for (const folder of folders) {
+          const found = await discoverMakefiles(
+            folder.uri.fsPath,
+            scanDepth,
+            excludePatterns
+          );
+          allMakefiles.push(...found);
+        }
+      }
+
+      // Also search Diffchestrator repo
+      const diffRepoPath = diffchestratorApi?.getSelectedRepo();
+      if (diffRepoPath) {
+        const found = await discoverMakefiles(diffRepoPath, scanDepth, excludePatterns);
+        for (const m of found) {
+          if (!allMakefiles.includes(m)) {
+            allMakefiles.push(m);
+          }
+        }
       }
 
       if (allMakefiles.length === 0) {
         vscode.window.showInformationMessage(
-          'Makestro: No Makefiles found in workspace.'
+          'Makestro: No Makefiles found.'
         );
         return;
       }
 
-      const workspaceRoot = folders[0].uri.fsPath;
+      const baseDir = folders?.[0]?.uri.fsPath ?? '';
       const items = allMakefiles.map((m) => ({
-        label: path.relative(workspaceRoot, m) || path.basename(m),
+        label: baseDir ? (path.relative(baseDir, m) || path.basename(m)) : path.basename(m),
         detail: m,
       }));
 
@@ -333,6 +389,34 @@ export async function activate(
     vscode.workspace.onDidChangeConfiguration(async (e) => {
       if (e.affectsConfiguration('makestro')) {
         await refreshTargets();
+      }
+    })
+  );
+
+  // --- Diffchestrator integration (optional) ---
+
+  diffchestratorApi = await getDiffchestratorApi();
+  if (diffchestratorApi) {
+    context.subscriptions.push(
+      diffchestratorApi.onDidChangeSelection(async () => {
+        await refreshTargets();
+      })
+    );
+  }
+
+  // Handle Diffchestrator activating after Makestro
+  context.subscriptions.push(
+    vscode.extensions.onDidChange(async () => {
+      if (!diffchestratorApi) {
+        diffchestratorApi = await getDiffchestratorApi();
+        if (diffchestratorApi) {
+          context.subscriptions.push(
+            diffchestratorApi.onDidChangeSelection(async () => {
+              await refreshTargets();
+            })
+          );
+          await refreshTargets();
+        }
       }
     })
   );
