@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] — 2026-04-09
+
+### Features
+- Add Explorer tab integration and Diffchestrator compatibility
+
+
 ## [0.2.1] — 2026-04-09
 
 ### Other
