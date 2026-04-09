@@ -1,8 +1,4 @@
 ### Development
-## Install all dependencies
-install:
-	npm install
-
 ## Compile TypeScript to JavaScript
 compile:
 	npm run compile
@@ -37,7 +33,7 @@ release-major:
 
 ### Publishing
 ## Install the latest Marketplace .vsix locally (excludes openvsx builds)
-install-local:
+install:
 	@vsix=$$(ls -t makestro-*.vsix 2>/dev/null | grep -v openvsx | head -1); \
 	if [ -z "$$vsix" ]; then echo "No .vsix found. Run 'make package' first."; exit 1; fi; \
 	echo "Installing $$vsix"; \
@@ -69,4 +65,4 @@ clean:
 nuke: clean
 	rm -rf node_modules/ *.vsix
 
-.PHONY: install compile watch lint package release release-patch release-minor release-major install-local publish-marketplace publish-openvsx publish clean nuke
+.PHONY: compile watch lint package release release-patch release-minor release-major install publish-marketplace publish-openvsx publish clean nuke
