@@ -1,5 +1,8 @@
 # Makestro 🎶
 
+> **Make** + **Maestro** — *the conductor of your Makefiles.*
+> From Italian/Spanish *maestro* (master, conductor). Like a maestro orchestrates a symphony, Makestro orchestrates your build targets.
+
 A language-agnostic VS Code extension that discovers and runs Makefile targets from a clean sidebar UI. Parses target descriptions, groups by sections, supports pinning favorites, quick-pick fuzzy search, and integrates with VS Code's built-in task runner.
 
 Built for engineers who live in Makefiles but don't want to keep switching to the terminal.
