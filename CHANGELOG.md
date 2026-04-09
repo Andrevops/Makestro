@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1] — 2026-04-09
+
+### Other
+- Chore: align Makefile install target with other extensions
+
+
 ## [0.2.0] — 2026-04-09
 
 ### Features
