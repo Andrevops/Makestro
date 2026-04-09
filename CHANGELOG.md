@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0] — 2026-04-09
+
+### Features
+- Add release pipeline, signing, documentation, and icon
+- Initial scaffold for Makestro VS Code extension
+
+
 ## [0.1.0] — 2026-04-09
 
 ### Features
