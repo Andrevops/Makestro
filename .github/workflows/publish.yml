@@ -1,0 +1,144 @@
+name: Release Extension
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile extension
+        run: npm run compile
+
+      - name: Package .vsix (Marketplace — andrevops-com)
+        run: npx @vscode/vsce package --no-dependencies
+
+      - name: Package .vsix (Open VSX — andrevops)
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json','utf-8'));
+            pkg.publisher = 'andrevops';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          npx @vscode/vsce package --no-dependencies -o "makestro-${VERSION}-openvsx.vsix"
+          git checkout package.json
+
+      - name: Generate checksums
+        run: |
+          sha256sum *.vsix > checksums.txt
+          cat checksums.txt
+
+      - name: Sign checksums
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "SIGNING_KEY not set, skipping signing"
+            exit 0
+          fi
+          echo "$SIGNING_KEY" | base64 -d > /tmp/signing.pem
+          openssl pkey -in /tmp/signing.pem -noout
+          openssl pkeyutl -sign -inkey /tmp/signing.pem -rawin -in checksums.txt \
+            | xxd -p -c 256 | tr -d '\n' > checksums.txt.sig
+          rm /tmp/signing.pem
+          echo "signature: $(cat checksums.txt.sig)"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "*.vsix"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          CURRENT_TAG="${GITHUB_REF#refs/tags/}"
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^${CURRENT_TAG}$" | head -1)
+
+          if [ -n "$PREV_TAG" ]; then
+            RANGE="${PREV_TAG}..${CURRENT_TAG}"
+          else
+            RANGE="${CURRENT_TAG}"
+          fi
+
+          {
+            echo "## What's Changed"
+            echo ""
+
+            FEATS=$(git log "$RANGE" --pretty=format:"%s" --no-merges | grep -E "^feat" | sed 's/^feat[^:]*: //' || true)
+            FIXES=$(git log "$RANGE" --pretty=format:"%s" --no-merges | grep -E "^fix" | sed 's/^fix[^:]*: //' || true)
+            OTHERS=$(git log "$RANGE" --pretty=format:"%s" --no-merges | grep -vE "^(feat|fix|chore\(release\))" | head -10 || true)
+
+            cap() { echo "$1" | sed 's/^./\U&/'; }
+
+            if [ -n "$FEATS" ]; then
+              echo "### Features"
+              echo "$FEATS" | while IFS= read -r line; do echo "- $(cap "$line")"; done
+              echo ""
+            fi
+
+            if [ -n "$FIXES" ]; then
+              echo "### Bug Fixes"
+              echo "$FIXES" | while IFS= read -r line; do echo "- $(cap "$line")"; done
+              echo ""
+            fi
+
+            if [ -n "$OTHERS" ]; then
+              echo "### Other"
+              echo "$OTHERS" | while IFS= read -r line; do echo "- $(cap "$line")"; done
+              echo ""
+            fi
+
+            echo "---"
+            echo "**Full Changelog**: [\`${PREV_TAG:-initial}..${CURRENT_TAG}\`](https://github.com/${{ github.repository }}/compare/${PREV_TAG:-initial}...${CURRENT_TAG})"
+            echo ""
+            echo "## Verify"
+            echo ""
+            echo '```sh'
+            echo "# Verify build provenance"
+            echo "gh attestation verify makestro-*.vsix --repo ${{ github.repository }}"
+            echo '```'
+          } > RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            *.vsix
+            checksums.txt
+            checksums.txt.sig
+          body_path: RELEASE_NOTES.md
+
+      # Uncomment when VSCE_PAT secret is configured
+      # - name: Publish to VS Code Marketplace
+      #   run: npx @vscode/vsce publish --no-dependencies
+      #   env:
+      #     VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        if: env.OVSX_PAT != ''
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          npx ovsx publish "makestro-${VERSION}-openvsx.vsix" -p "$OVSX_PAT"
