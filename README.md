@@ -7,6 +7,7 @@ Built for engineers who live in Makefiles but don't want to keep switching to th
 ## Features
 
 - **Sidebar tree view** with activity bar icon — browse all targets at a glance
+- **Explorer integration** — Make Targets panel in the VS Code Explorer tab
 - **Section grouping** via `### Section Name` comments in your Makefile
 - **Target descriptions** via `## Description` comments above targets
 - **`.PHONY` awareness** — icons differentiate phony vs file-based targets
@@ -18,6 +19,7 @@ Built for engineers who live in Makefiles but don't want to keep switching to th
 - **Multi-Makefile support** — auto-discovers Makefiles, or select one manually
 - **File watcher** — auto-refreshes when your Makefile changes
 - **VS Code Task Provider** — targets appear in `Tasks: Run Task`
+- **[Diffchestrator](https://marketplace.visualstudio.com/items?itemName=andrevops-com.diffchestrator) integration** — auto-discovers Makefiles from the selected repo
 
 ## Makefile Conventions
 
@@ -71,6 +73,21 @@ All commands are available via the Command Palette (`Ctrl+Shift+P`):
 | `Makestro: Select Makefile...` | Choose which Makefile to use |
 | `Makestro: Run Target with Arguments...` | Run with extra args/variables |
 
+## Diffchestrator Integration
+
+When [Diffchestrator](https://marketplace.visualstudio.com/items?itemName=andrevops-com.diffchestrator) is installed, Makestro automatically discovers Makefiles from the currently selected repo — even if that repo is outside your workspace.
+
+- Select a repo in Diffchestrator and Makestro shows its targets
+- Switch repos and Makestro auto-refreshes
+- Works in both the Makestro sidebar and the Explorer panel
+- No configuration needed — the integration is automatic and optional
+
+Makefile resolution priority:
+
+1. `makestro.defaultMakefile` setting (explicit path always wins)
+2. Diffchestrator's selected repo
+3. Workspace folder auto-discovery
+
 ## Configuration
 
 | Setting | Default | Description |
@@ -90,7 +107,7 @@ All commands are available via the Command Palette (`Ctrl+Shift+P`):
 
 ```bash
 # Install dependencies
-make install
+npm install
 
 # Watch mode (recompile on changes)
 make watch

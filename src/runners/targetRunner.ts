@@ -4,6 +4,7 @@ import { MakeTarget } from '../types';
 
 export class TargetRunner {
   private activeTerminal: vscode.Terminal | undefined;
+  private terminalClosed = false;
   private lastTarget: { target: MakeTarget; args?: string } | undefined;
 
   async run(target: MakeTarget, args?: string): Promise<void> {
@@ -56,27 +57,28 @@ export class TargetRunner {
   private async runInTerminal(
     command: string,
     cwd: string,
-    targetName: string
+    _targetName: string
   ): Promise<void> {
     // Reuse existing Makestro terminal or create a new one
-    const terminalName = `Makestro: ${targetName}`;
+    if (!this.activeTerminal || this.terminalClosed) {
+      this.activeTerminal = vscode.window.createTerminal({
+        name: 'Makestro',
+        cwd,
+        iconPath: new vscode.ThemeIcon('tools'),
+      });
+      this.terminalClosed = false;
 
-    this.activeTerminal = vscode.window.createTerminal({
-      name: terminalName,
-      cwd,
-      iconPath: new vscode.ThemeIcon('tools'),
-    });
+      const disposable = vscode.window.onDidCloseTerminal((t) => {
+        if (t === this.activeTerminal) {
+          this.activeTerminal = undefined;
+          this.terminalClosed = true;
+          disposable.dispose();
+        }
+      });
+    }
 
     this.activeTerminal.show();
     this.activeTerminal.sendText(command);
-
-    // Track terminal disposal
-    const disposable = vscode.window.onDidCloseTerminal((t) => {
-      if (t === this.activeTerminal) {
-        this.activeTerminal = undefined;
-        disposable.dispose();
-      }
-    });
   }
 
   private async runInOutputChannel(
