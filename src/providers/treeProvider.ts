@@ -11,9 +11,7 @@ export class TargetTreeProvider implements vscode.TreeDataProvider<TreeElement> 
   private showPhonyOnly = false;
 
   refresh(parseResult?: ParseResult): void {
-    if (parseResult) {
-      this.parseResult = parseResult;
-    }
+    this.parseResult = parseResult;
     this._onDidChangeTreeData.fire(undefined);
   }
 
