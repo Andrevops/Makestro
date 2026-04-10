@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] — 2026-04-10
+
+### Bug Fixes
+- Preserve editor focus when showing terminal after target run
+
+
 ## [0.5.0] — 2026-04-10
 
 ### Features
