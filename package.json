@@ -2,7 +2,7 @@
   "name": "makestro",
   "displayName": "Makestro",
   "description": "A language-agnostic Makefile target runner with sidebar navigation, quick-pick, pinned targets, and section grouping.",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "publisher": "andrevops-com",
   "license": "MIT",
   "engines": {

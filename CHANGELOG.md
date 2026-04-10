@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.4] — 2026-04-10
+
+### Bug Fixes
+- Skip target-specific variable assignments and deduplicate targets
+
+
 ## [0.5.3] — 2026-04-10
 
 ### Bug Fixes
