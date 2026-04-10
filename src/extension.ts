@@ -254,6 +254,20 @@ export async function activate(
     })
   );
 
+  // Pinned target slots: Alt+M 1..9,0
+  for (let i = 0; i < 10; i++) {
+    context.subscriptions.push(
+      vscode.commands.registerCommand(`makestro.runPinned${i}`, async () => {
+        const target = pinnedTree.getByIndex(i);
+        if (target) {
+          await runner.run(target);
+        } else {
+          vscode.window.showInformationMessage(`Makestro: No pinned target in slot ${i + 1}.`);
+        }
+      })
+    );
+  }
+
   context.subscriptions.push(
     vscode.commands.registerCommand('makestro.stopRunning', () => {
       runner.stop();

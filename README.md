@@ -61,6 +61,7 @@ Both prefixes are configurable via settings.
 | `Alt+M R` | Quick Run (fuzzy picker) |
 | `Alt+M L` | Re-run Last Target |
 | `Alt+M S` | Stop Running Target |
+| `Alt+M 1`..`9`, `0` | Run pinned target by slot (1st through 10th) |
 
 ## Commands
 

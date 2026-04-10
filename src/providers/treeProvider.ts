@@ -115,6 +115,10 @@ export class PinnedTargetTreeProvider implements vscode.TreeDataProvider<TargetI
   getChildren(): TargetItem[] {
     return this.targets.map((t) => new TargetItem(t));
   }
+
+  getByIndex(index: number): MakeTarget | undefined {
+    return this.targets[index];
+  }
 }
 
 class SectionItem extends vscode.TreeItem {
