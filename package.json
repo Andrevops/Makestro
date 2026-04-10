@@ -284,12 +284,9 @@
           "description": "Automatically refresh targets when Makefile changes."
         },
         "makestro.pinnedTargets": {
-          "type": "array",
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "description": "List of pinned target names (managed via context menu)."
+          "type": "object",
+          "default": {},
+          "description": "Pinned targets per Makefile path (managed via context menu)."
         },
         "makestro.showPhonyOnly": {
           "type": "boolean",

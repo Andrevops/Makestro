@@ -16,6 +16,39 @@ const DIFFCHESTRATOR_ID = 'andrevops-com.diffchestrator';
 let activeMakefilePath: string | undefined;
 let diffchestratorApi: DiffchestratorApi | undefined;
 
+type PinnedMap = Record<string, string[]>;
+
+function getPinnedForMakefile(makefilePath: string): string[] {
+  const config = vscode.workspace.getConfiguration('makestro');
+  const raw = config.get<PinnedMap | string[]>('pinnedTargets', {});
+
+  // Backward compat: migrate flat array to map
+  if (Array.isArray(raw)) {
+    return raw;
+  }
+
+  return raw[makefilePath] ?? [];
+}
+
+async function setPinnedForMakefile(makefilePath: string, names: string[]): Promise<void> {
+  const config = vscode.workspace.getConfiguration('makestro');
+  const raw = config.get<PinnedMap | string[]>('pinnedTargets', {});
+
+  // Migrate from legacy array if needed
+  const map: PinnedMap = Array.isArray(raw) ? {} : { ...raw };
+
+  if (names.length > 0) {
+    map[makefilePath] = names;
+  } else {
+    delete map[makefilePath];
+  }
+
+  const scope = vscode.workspace.workspaceFolders
+    ? vscode.ConfigurationTarget.Workspace
+    : vscode.ConfigurationTarget.Global;
+  await config.update('pinnedTargets', map, scope);
+}
+
 async function getDiffchestratorApi(): Promise<DiffchestratorApi | undefined> {
   const ext = vscode.extensions.getExtension<DiffchestratorApi>(DIFFCHESTRATOR_ID);
   if (!ext) {
@@ -92,10 +125,8 @@ export async function activate(
     targetTree.setShowPhonyOnly(showPhonyOnly);
     targetTree.refresh(result);
 
-    // Refresh pinned targets
-    const pinnedNames = vscode.workspace
-      .getConfiguration('makestro')
-      .get<string[]>('pinnedTargets', []);
+    // Refresh pinned targets (scoped to current Makefile)
+    const pinnedNames = getPinnedForMakefile(makefilePath);
     pinnedTree.refresh(result.targets, pinnedNames);
 
     vscode.commands.executeCommand('setContext', 'makestro.hasPinnedTargets', pinnedNames.length > 0);
@@ -240,19 +271,14 @@ export async function activate(
       'makestro.pinTarget',
       async (item?: TargetItem) => {
         const target = resolveTarget(item, targetTree);
-        if (!target) {
+        if (!target || !activeMakefilePath) {
           return;
         }
 
-        const config = vscode.workspace.getConfiguration('makestro');
-        const pinned = config.get<string[]>('pinnedTargets', []);
-
+        const pinned = getPinnedForMakefile(activeMakefilePath);
         if (!pinned.includes(target.name)) {
           pinned.push(target.name);
-          const scope = vscode.workspace.workspaceFolders
-            ? vscode.ConfigurationTarget.Workspace
-            : vscode.ConfigurationTarget.Global;
-          await config.update('pinnedTargets', pinned, scope);
+          await setPinnedForMakefile(activeMakefilePath, pinned);
           await refreshTargets();
         }
       }
@@ -264,18 +290,13 @@ export async function activate(
       'makestro.unpinTarget',
       async (item?: TargetItem) => {
         const target = resolveTarget(item, targetTree);
-        if (!target) {
+        if (!target || !activeMakefilePath) {
           return;
         }
 
-        const config = vscode.workspace.getConfiguration('makestro');
-        const pinned = config.get<string[]>('pinnedTargets', []);
+        const pinned = getPinnedForMakefile(activeMakefilePath);
         const updated = pinned.filter((n) => n !== target.name);
-
-        const scope = vscode.workspace.workspaceFolders
-          ? vscode.ConfigurationTarget.Workspace
-          : vscode.ConfigurationTarget.Global;
-        await config.update('pinnedTargets', updated, scope);
+        await setPinnedForMakefile(activeMakefilePath, updated);
         await refreshTargets();
       }
     )
