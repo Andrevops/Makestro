@@ -2,7 +2,7 @@
   "name": "makestro",
   "displayName": "Makestro",
   "description": "A language-agnostic Makefile target runner with sidebar navigation, quick-pick, pinned targets, and section grouping.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "publisher": "andrevops-com",
   "license": "MIT",
   "engines": {
@@ -152,16 +152,56 @@
         "category": "Makestro",
         "icon": "$(file)"
       },
-      { "command": "makestro.runPinned0", "title": "Run Pinned Target 1", "category": "Makestro" },
-      { "command": "makestro.runPinned1", "title": "Run Pinned Target 2", "category": "Makestro" },
-      { "command": "makestro.runPinned2", "title": "Run Pinned Target 3", "category": "Makestro" },
-      { "command": "makestro.runPinned3", "title": "Run Pinned Target 4", "category": "Makestro" },
-      { "command": "makestro.runPinned4", "title": "Run Pinned Target 5", "category": "Makestro" },
-      { "command": "makestro.runPinned5", "title": "Run Pinned Target 6", "category": "Makestro" },
-      { "command": "makestro.runPinned6", "title": "Run Pinned Target 7", "category": "Makestro" },
-      { "command": "makestro.runPinned7", "title": "Run Pinned Target 8", "category": "Makestro" },
-      { "command": "makestro.runPinned8", "title": "Run Pinned Target 9", "category": "Makestro" },
-      { "command": "makestro.runPinned9", "title": "Run Pinned Target 10", "category": "Makestro" }
+      {
+        "command": "makestro.runPinned0",
+        "title": "Run Pinned Target 1",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned1",
+        "title": "Run Pinned Target 2",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned2",
+        "title": "Run Pinned Target 3",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned3",
+        "title": "Run Pinned Target 4",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned4",
+        "title": "Run Pinned Target 5",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned5",
+        "title": "Run Pinned Target 6",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned6",
+        "title": "Run Pinned Target 7",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned7",
+        "title": "Run Pinned Target 8",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned8",
+        "title": "Run Pinned Target 9",
+        "category": "Makestro"
+      },
+      {
+        "command": "makestro.runPinned9",
+        "title": "Run Pinned Target 10",
+        "category": "Makestro"
+      }
     ],
     "menus": {
       "view/title": [
@@ -230,16 +270,46 @@
           "command": "makestro.goToTarget",
           "when": "false"
         },
-        { "command": "makestro.runPinned0", "when": "false" },
-        { "command": "makestro.runPinned1", "when": "false" },
-        { "command": "makestro.runPinned2", "when": "false" },
-        { "command": "makestro.runPinned3", "when": "false" },
-        { "command": "makestro.runPinned4", "when": "false" },
-        { "command": "makestro.runPinned5", "when": "false" },
-        { "command": "makestro.runPinned6", "when": "false" },
-        { "command": "makestro.runPinned7", "when": "false" },
-        { "command": "makestro.runPinned8", "when": "false" },
-        { "command": "makestro.runPinned9", "when": "false" }
+        {
+          "command": "makestro.runPinned0",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned1",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned2",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned3",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned4",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned5",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned6",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned7",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned8",
+          "when": "false"
+        },
+        {
+          "command": "makestro.runPinned9",
+          "when": "false"
+        }
       ]
     },
     "keybindings": [
@@ -258,16 +328,56 @@
         "key": "alt+m s",
         "when": "!terminalFocus"
       },
-      { "command": "makestro.runPinned0", "key": "alt+m 1", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned1", "key": "alt+m 2", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned2", "key": "alt+m 3", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned3", "key": "alt+m 4", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned4", "key": "alt+m 5", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned5", "key": "alt+m 6", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned6", "key": "alt+m 7", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned7", "key": "alt+m 8", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned8", "key": "alt+m 9", "when": "!terminalFocus" },
-      { "command": "makestro.runPinned9", "key": "alt+m 0", "when": "!terminalFocus" }
+      {
+        "command": "makestro.runPinned0",
+        "key": "alt+m 1",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned1",
+        "key": "alt+m 2",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned2",
+        "key": "alt+m 3",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned3",
+        "key": "alt+m 4",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned4",
+        "key": "alt+m 5",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned5",
+        "key": "alt+m 6",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned6",
+        "key": "alt+m 7",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned7",
+        "key": "alt+m 8",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned8",
+        "key": "alt+m 9",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "makestro.runPinned9",
+        "key": "alt+m 0",
+        "when": "!terminalFocus"
+      }
     ],
     "configuration": {
       "title": "Makestro",

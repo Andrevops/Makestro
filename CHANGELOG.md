@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.0] — 2026-04-10
+
+### Features
+- Run pinned targets by slot with Alt+M 1-9,0 keybindings
+
+
 ## [0.4.0] — 2026-04-10
 
 ### Features
