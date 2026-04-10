@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.2] — 2026-04-10
+
+### Bug Fixes
+- Clear targets and pinned views when repo has no Makefile
+
+
 ## [0.5.1] — 2026-04-10
 
 ### Bug Fixes
