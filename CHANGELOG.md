@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0] — 2026-04-10
+
+### Features
+- Animate individual SVG elements — gear rotation, baton conducting, floating notes
+
+### Bug Fixes
+- Regenerate animated icon with transparent background
+
+### Other
+- Docs: add Andrevops ecosystem section
+- Docs: add animated icon to README header
+
+
 ## [0.5.4] — 2026-04-10
 
 ### Bug Fixes
