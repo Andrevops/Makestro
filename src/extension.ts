@@ -103,7 +103,10 @@ export async function activate(
     vscode.commands.executeCommand('setContext', 'makestro.hasMakefile', !!makefilePath);
 
     if (!makefilePath) {
+      activeMakefilePath = undefined;
       targetTree.refresh(undefined);
+      pinnedTree.refresh([], []);
+      watcher.clearExternalWatch();
       vscode.commands.executeCommand('setContext', 'makestro.hasPinnedTargets', false);
       return;
     }
