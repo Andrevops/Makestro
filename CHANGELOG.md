@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.3] — 2026-04-10
+
+### Bug Fixes
+- Clear stale tree data when refreshing with no Makefile
+
+
 ## [0.5.2] — 2026-04-10
 
 ### Bug Fixes
