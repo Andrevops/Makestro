@@ -161,6 +161,25 @@ openssl pkeyutl -verify -pubin -inkey public_key.pem -rawin \
   -in checksums.txt -sigfile <(xxd -r -p checksums.txt.sig)
 ```
 
+## Andrevops Ecosystem
+
+Makestro is part of the [Andrevops](https://github.com/Andrevops) developer tooling suite.
+
+| Tool | Relationship |
+|------|-------------|
+| [Diffchestrator](https://github.com/Andrevops/diffchestrator) | **Direct integration** — Makestro consumes Diffchestrator's public API. When you select a repo in Diffchestrator, Makestro auto-discovers its Makefile and refreshes the sidebar. No configuration needed. |
+| [Epic-Lens](https://github.com/Andrevops/Epic-Lens) | Sibling extension — both consume Diffchestrator's API for repo-aware context |
+| [claude-sandbox](https://github.com/Andrevops/claude-sandbox) | Complementary — run `make` targets in sandboxed Claude Code sessions launched from Diffchestrator |
+| [claude-stats](https://github.com/Andrevops/claude-stats) | Complementary CLI — analyzes Claude Code session data |
+
+### Makefile Resolution Priority
+
+When Diffchestrator is installed, Makestro resolves Makefiles in this order:
+
+1. Explicit `makestro.defaultMakefile` setting
+2. **Diffchestrator's currently selected repo** (automatic)
+3. Workspace folder auto-discovery
+
 ## License
 
 MIT
