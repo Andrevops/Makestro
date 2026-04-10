@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/makestro-icon-animated.gif" alt="Makestro" width="128" />
+</p>
+
 # Makestro 🎶
 
 > **Make** + **Maestro** — *the conductor of your Makefiles.*
