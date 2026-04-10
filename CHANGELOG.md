@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0] — 2026-04-10
+
+### Features
+- Scope pinned targets per Makefile path
+
+
 ## [0.3.4] — 2026-04-09
 
 ### Other
