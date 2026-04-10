@@ -40,6 +40,7 @@ export class MakefileParser {
     const variables: MakeVariable[] = [];
     const sections: MakeSection[] = [];
     const phonyTargets = new Set<string>();
+    const seenTargets = new Set<string>();
 
     let currentSection: MakeSection | undefined;
     let pendingDescription: string | undefined;
@@ -139,6 +140,18 @@ export class MakefileParser {
           continue;
         }
 
+        // Skip target-specific variable assignments (e.g. target: VAR?=value)
+        if (/^[A-Za-z_][A-Za-z0-9_]*\s*(\?=|:=|\+=|=)/.test(depsStr)) {
+          continue;
+        }
+
+        // Deduplicate: skip if we already have this target
+        if (seenTargets.has(targetName)) {
+          pendingDescriptionLines = [];
+          pendingDescription = undefined;
+          continue;
+        }
+
         const dependencies = depsStr
           ? depsStr
               .split(/\s+/)
@@ -156,6 +169,7 @@ export class MakefileParser {
         };
 
         targets.push(target);
+        seenTargets.add(targetName);
         currentSection?.targets.push(target);
 
         pendingDescriptionLines = [];
