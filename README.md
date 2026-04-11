@@ -106,7 +106,7 @@ Makefile resolution priority:
 | `makestro.descriptionCommentPrefix` | `##` | Prefix for target descriptions |
 | `makestro.sectionCommentPrefix` | `###` | Prefix for section headers |
 | `makestro.autoRefresh` | `true` | Auto-refresh on Makefile changes |
-| `makestro.pinnedTargets` | `[]` | Pinned target names (managed via UI) |
+| `makestro.pinnedTargets` | `{}` | Pinned targets per Makefile path (managed via UI) |
 | `makestro.showPhonyOnly` | `false` | Only show `.PHONY` targets |
 | `makestro.runInIntegratedTerminal` | `true` | Run in terminal (false = output channel) |
 | `makestro.defaultMakefile` | `""` | Explicit Makefile path (empty = auto-detect) |
